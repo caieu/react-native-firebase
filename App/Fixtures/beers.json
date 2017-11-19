@@ -1,0 +1,47 @@
+{
+  "data" : [
+    {
+      "label" : "Skol",
+      "price" : 3.99,
+      "quantity" : 600,
+      "metric" : "ml",
+      "type" : "can"
+    },
+    {
+      "label" : "Kaiser",
+      "price" : 4.99,
+      "quantity" : 600,
+      "metric" : "ml",
+      "type" : "can"
+    },
+    {
+      "label" : "Budweiser",
+      "price" : 5.99,
+      "quantity" : 600,
+      "metric" : "ml",
+      "type" : "can"
+    },
+    {
+      "label" : "Stella Atoir",
+      "price" : 6.99,
+      "quantity" : 600,
+      "metric" : "ml",
+      "type" : "bottle"
+    },
+    {
+      "label" : "Sol",
+      "price" : 7.99,
+      "quantity" : 600,
+      "metric" : "ml",
+      "type" : "bottle"
+    },
+    {
+      "label" : "Glacial",
+      "price" : 8.99,
+      "quantity" : 600,
+      "metric" : "ml",
+      "type" : "bottle"
+    },
+
+  ]
+}
