@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, KeyboardAvoidingView, TextInput, Button } from 'react-native'
+import { ScrollView, Text, KeyboardAvoidingView, TextInput, Button, View, Picker } from 'react-native'
 import { connect } from 'react-redux'
 import firebase from 'react-native-firebase';
 import { StackNavigator, NavigationActions } from 'react-navigation'
@@ -43,31 +43,72 @@ class AddOfferScreen extends Component {
     return (
       <ScrollView style={styles.container}>
         <KeyboardAvoidingView behavior='position'>
-          <TextInput
-            style={styles.field}
-            placeholder= "Label"
-            onChangeText={(value) => this.setState({label: value})}
-          />
-          <TextInput
-            style={styles.field}
-            placeholder= "Price"
-            onChangeText={(value) => this.setState({price: value})}
-          />
-          <TextInput
-            style={styles.field}
-            placeholder= "Volume"
-            onChangeText={(value) => this.setState({volume: value})}
-          />
-          <TextInput
-            style={styles.field}
-            placeholder= "Metric"
-            onChangeText={(value) => this.setState({metric: value})}
-          />
-          <TextInput
-            style={styles.field}
-            placeholder= "Type"
-            onChangeText={(value) => this.setState({type: value})}
-          />
+          <View style= {styles.inputRow}>
+            <Text style={styles.labelField}>
+              Label:
+            </Text>
+            <TextInput
+              ref='LabelInput'
+              style={styles.inputField}
+              placeholder= "Label"
+              onChangeText={(value) => this.setState({label: value})}
+              returnKeyType="next"
+              onSubmitEditing={(event) => this.refs.PriceInput.focus()}
+            />
+          </View>
+          <View style= {styles.inputRow}>
+            <Text style={styles.labelField}>
+              Price:
+            </Text>
+            <TextInput
+              ref='PriceInput'
+              style={styles.inputField}
+              placeholder= "Price"
+              keyboardType="numeric"
+              onChangeText={(value) => this.setState({price: value})}
+              returnKeyType="next"
+              onSubmitEditing={(event) => this.refs.VolumeInput.focus()}
+            />
+          </View>
+          <View style= {styles.inputRow}>
+            <Text style={styles.labelField}>
+              Volume:
+            </Text>
+            <TextInput
+              ref='VolumeInput'
+              style={styles.inputField}
+              placeholder= "Volume"
+              keyboardType="numeric"
+              onChangeText={(value) => this.setState({volume: value})}
+              returnKeyType="next"
+            />
+          </View>
+          <View style= {styles.inputRow}>
+            <Text style={styles.labelField}>
+              Metric:
+            </Text>
+            <Picker
+              ref='MetricInput'
+              style={styles.inputField}
+              selectedValue={this.state.metric}
+              onValueChange={(itemValue, itemIndex) => this.setState({metric: itemValue})}>
+              <Picker.Item label="ML" value="ml" />
+              <Picker.Item label="Litro" value="lt" />
+            </Picker>
+          </View>
+          <View style= {styles.inputRow}>
+            <Text style={styles.labelField}>
+              Type:
+            </Text>
+            <Picker
+              ref='TypeInput'
+              style={styles.inputField}
+              selectedValue={this.state.type}
+              onValueChange={(itemValue, itemIndex) => this.setState({type: itemValue})}>
+              <Picker.Item label="Can" value="can" />
+              <Picker.Item label="Bottle" value="bottle" />
+            </Picker>
+          </View>
           <Button
             onPress={this.onPressAddOffer.bind(this)}
             title="Add Offer"

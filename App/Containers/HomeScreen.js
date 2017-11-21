@@ -14,7 +14,7 @@ import styles from './Styles/HomeScreenStyle'
 class HomeScreen extends Component {
 
   static navigationOptions = {
-    title: 'Welcome',
+    title: 'Cheap Beer',
   };
 
   constructor (props) {
