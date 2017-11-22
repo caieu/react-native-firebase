@@ -19,7 +19,7 @@ export default StyleSheet.create({
   },
   inputField: {
     margin: Metrics.baseMargin,
-    flex: 5
+    flex: 4
   },
   addButton: {
     margin: Metrics.baseMargin

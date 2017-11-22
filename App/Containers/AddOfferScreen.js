@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, KeyboardAvoidingView, TextInput, Button, View, Picker } from 'react-native'
+import { ScrollView, Text, KeyboardAvoidingView, TextInput, Button, View, Picker, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import firebase from 'react-native-firebase';
 import { StackNavigator, NavigationActions } from 'react-navigation'
+import RNGooglePlaces from 'react-native-google-places'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
@@ -30,13 +31,37 @@ class AddOfferScreen extends Component {
       volume: 0,
       metric: "ml",
       type: "can",
+      place: {name : "Select a Location"}
     };
     this.offersRef = firebase.database().ref("/offers");
   }
 
   onPressAddOffer () {
-    this.offersRef.push(this.state);
+    let offerObject = {
+      label: this.state.label,
+      price: this.state.price,
+      volume: this.state.volume,
+      metric: this.state.metric,
+      type: this.state.type,
+      placeID: this.state.place.placeID
+    }
+    this.offersRef.push(offerObject);
+    firebase.database().ref("/places/" + offerObject.placeID).set(this.state.place);
     this.props.navigation.dispatch(resetAction);
+  }
+
+  openSearchModal() {
+
+    let self = this;
+    RNGooglePlaces.openPlacePickerModal()
+    .then((place) => {
+		console.log(place);
+    self.setState({place:place});
+
+		// place represents user's selection from the
+		// suggestions and it is a simplified Google Place object.
+    })
+    .catch(error => console.log(error.message));  // error is a Javascript Error object
   }
 
   render () {
@@ -108,6 +133,25 @@ class AddOfferScreen extends Component {
               <Picker.Item label="Can" value="can" />
               <Picker.Item label="Bottle" value="bottle" />
             </Picker>
+          </View>
+          <View>
+            <TouchableOpacity
+              style= {styles.inputRow}
+              onPress={() => this.openSearchModal()}
+            >
+              <Text style={styles.labelField}>
+                Location:
+              </Text>
+                <TextInput
+                  ref='LocationInput'
+                  style={styles.inputField}
+                  placeholder= "Select a location"
+                  returnKeyType="next"
+                  editable={false}
+                  value={this.state.place.name}
+                  onFocus={(event) => this.openSearchModal()}
+                />
+            </TouchableOpacity>
           </View>
           <Button
             onPress={this.onPressAddOffer.bind(this)}
