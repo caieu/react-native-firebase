@@ -35,7 +35,7 @@ export default class OfferListItem extends Component {
           </View>
           <View style={styles.infoContainer}>
             <Text  style={styles.label}>{offer.label} {offer.volume}{offer.metric}</Text>
-            <Text style={styles.price}>Price: R${offer.price}</Text>
+            <Text style={styles.price}>R${offer.price}</Text>
           </View>
         </View>
       </TouchableHighlight>

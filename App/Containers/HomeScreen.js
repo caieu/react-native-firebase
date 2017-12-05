@@ -37,6 +37,7 @@ class HomeScreen extends Component {
           volume: child.val().volume,
           metric: child.val().metric,
           type: child.val().type,
+          placeID: child.val().placeID,
           _key: child.key
         });
       });

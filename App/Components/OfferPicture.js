@@ -19,18 +19,21 @@ export default class OfferPicture extends Component {
 
   constructor (props) {
     super(props);
-    this.state = {img: {uri:""}};
+    this.state = {img: Images.closeButton};
     let path = "gs://cheapbeer-1b1c8.appspot.com/offersPictures/" + props.offerId;
     firebase.storage().refFromURL(path).getDownloadURL().then((url) => {
-      this.setState({img: {uri: url}});
-    }).catch((error) => {return});
+      if (url) {
+        this.setState({img: {uri: url}});
+      }
+    }).catch((error) => {
+      return;
+    });
   }
 
   render () {
     return (
-      <Image style  = {styles.picture}
-             source = {this.state.img.uri ?
-                      this.state.img : Images.closeButton}
+      <Image  style  = {styles.picture}
+              source = {this.state.img}
               resizeMode  = {this.props.resizeMode ? this.props.resizeMode : 'cover'}/>
     )
   }
