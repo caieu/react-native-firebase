@@ -3,11 +3,15 @@ package com.cheapbeer;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.imagepicker.ImagePickerPackage;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.arttitude360.reactnative.rngoogleplaces.RNGooglePlacesPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
+import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -28,11 +32,15 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNFetchBlobPackage(),
+            new ImagePickerPackage(),
+            new ReactNativeConfigPackage(),
             new RNGooglePlacesPackage(),
             new VectorIconsPackage(),
           new RNFirebasePackage(),
           new RNFirebaseAuthPackage(),
-          new RNFirebaseDatabasePackage() 
+          new RNFirebaseDatabasePackage(),
+          new RNFirebaseStoragePackage()
       );
     }
 

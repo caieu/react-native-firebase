@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { ScrollView, Text, KeyboardAvoidingView, FlatList, View } from 'react-native'
 import { connect } from 'react-redux'
-import BeerListItem from '../Components/BeerListItem';
+import OfferListItem from '../Components/OfferListItem';
 import PrimaryNav from '../Navigation/AppNavigation'
 import ActionButton from 'react-native-action-button';
 import firebase from 'react-native-firebase';
+import { Colors } from '../Themes/'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
@@ -15,11 +16,12 @@ class HomeScreen extends Component {
 
   static navigationOptions = {
     title: 'Cheap Beer',
+    headerTitleStyle: styles.headerTitle
   };
 
   constructor (props) {
     super(props);
-    this.itemsRef = firebase.database().ref("/offers");
+    this.itemsRef = firebase.database().ref("/offers").orderByChild('createdAt').limitToLast(10);
     this.state = {data: []};
   }
 
@@ -40,7 +42,7 @@ class HomeScreen extends Component {
       });
 
       this.setState({
-        data: items
+        data: items.reverse()
       });
 
     });
@@ -51,8 +53,8 @@ class HomeScreen extends Component {
   }
 
   _renderItem = ({item}) => (
-    <BeerListItem item={item}>
-    </BeerListItem>
+    <OfferListItem item={item} navigation={this.props.navigation}>
+    </OfferListItem>
   );
 
   render () {
@@ -73,8 +75,8 @@ class HomeScreen extends Component {
           </KeyboardAvoidingView>
         </ScrollView>
         <ActionButton
-          buttonColor = "rgba(231,76,60,1)"
-          offsetX = {10}
+          buttonColor = '#f1c40f'
+          offsetX = {15}
           offsety = {10}
           onPress = {() => { navigate('AddOfferScreen')}}
         />

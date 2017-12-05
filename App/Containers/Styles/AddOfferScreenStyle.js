@@ -14,14 +14,27 @@ export default StyleSheet.create({
     flex: 1,
     textAlign: 'right',
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#000000'
+    color: 'black'
   },
   inputField: {
     margin: Metrics.baseMargin,
-    flex: 4
+    flex: 4,
+    color: 'black'
   },
   addButton: {
     margin: Metrics.baseMargin
+  },
+  pictureRow: {
+    flex: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  picture: {
+    width: 80,
+    height: 80,
+    resizeMode: "contain",
+    margin: Metrics.baseMargin,
+    flex: 4
   }
 })
