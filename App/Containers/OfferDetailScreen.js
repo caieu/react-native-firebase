@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, KeyboardAvoidingView, Image, View } from 'react-native'
+import { ScrollView, Text, KeyboardAvoidingView, Image, View, Linking } from 'react-native'
 import { connect } from 'react-redux'
 import OfferPicture from '../Components/OfferPicture'
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import call from 'react-native-phone-call'
+import openMap from 'react-native-open-maps';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
@@ -36,6 +37,20 @@ class OfferDetailScreen extends Component {
     call(args).catch(console.error);
   }
 
+  openPlace () {
+    let url = "https://www.google.com/maps/search/?api=1&query=" +
+              this.state.place.latitude + "," + this.state.place.longitude +
+              "&query_place_id=" + this.state.place.placeID;
+
+    Linking.canOpenURL(url).then(supported => {
+      if (!supported) {
+        console.log('Can\'t handle url: ' + url);
+      } else {
+        return Linking.openURL(url);
+      }
+    }).catch(err => console.error('An error occurred', err));
+}
+
   render () {
     let offer = this.props.navigation.state.params.offer;
 
@@ -60,7 +75,7 @@ class OfferDetailScreen extends Component {
         <Text style={styles.placeAddressText}>{this.state.place.address}</Text>
         <View style={styles.placeOptionsContainer}>
           <View style={styles.placeMapOptionContainer}>
-            <Icon.Button name="map-o" size={30} color= "gray" backgroundColor="transparent">
+            <Icon.Button name="map-o" size={30} color= "gray" backgroundColor="transparent" onPress={this.openPlace.bind(this)}>
             <Text>Map</Text>
             </Icon.Button>
           </View>
@@ -68,11 +83,11 @@ class OfferDetailScreen extends Component {
         </View>
       </View>;
     }
-    
+
     return (
       <View style={styles.offerDetailContainer}>
         <View style={styles.pictureContainer}>
-          <OfferPicture offerId={offer._key} resizeMode="contain"/>
+          <OfferPicture offerId={offer._key} resizeMode="cover"/>
         </View>
         <View style={styles.infoContainer}>
           <Text style={styles.labelText}>{offer.label} <Text style={styles.volumeText}>{offer.volume}{offer.metric}</Text></Text>

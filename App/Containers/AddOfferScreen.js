@@ -6,7 +6,7 @@ import { Images } from '../Themes'
 import { StackNavigator, NavigationActions } from 'react-navigation'
 import firebase from 'react-native-firebase';
 import RNGooglePlaces from 'react-native-google-places'
-import ImagePicker from 'react-native-image-picker'
+import ImagePicker from 'react-native-image-crop-picker';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
@@ -67,25 +67,18 @@ class AddOfferScreen extends Component {
   }
 
   openImagePicker() {
-    ImagePicker.showImagePicker(null, (response) => {
-      console.log('Response = ', response);
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      }
-      else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      }
-      else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      }
-      else {
-        let source = { uri: response.uri };
-        console.log(response);
-        this.setState({
-          picture: source
-        });
-      }
+    ImagePicker.openCamera({
+      width: 800,
+      height: 800,
+      cropping: true
+    }).then(image => {
+      let source = { uri: image.path };
+      console.log(image);
+      this.setState({
+        picture: source
+      });
     });
+
   }
 
   uploadImage(uri, offerKey, mime = 'image/jpg') {
