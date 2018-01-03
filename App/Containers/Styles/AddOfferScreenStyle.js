@@ -3,26 +3,46 @@ import { ApplicationStyles, Metrics } from '../../Themes/'
 
 export default StyleSheet.create({
   ...ApplicationStyles.screen,
-  inputRow: {
-    flex: 1,
-    flexDirection: 'row',
+  stage: {
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    flex: 2,
+    width: '100%'
   },
-  labelField: {
+  stageTitle: {
     margin: Metrics.baseMargin,
+    fontSize: 24,
+    color: 'black',
+    textAlign: 'center'
+  },
+  stageField: {
+    margin: Metrics.baseMargin,
+    color: 'black',
+    width: '90%',
+    fontSize: 18,
+    textAlign: 'center'
+  },
+  volumeInputContainer : {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%'
+  },
+  volumeInput : {
+    flex: 2,
+    margin: Metrics.baseMargin,
+  },
+  volumeMetric : {
     flex: 1,
-    textAlign: 'right',
-    fontSize: 14,
-    color: 'black'
-  },
-  inputField: {
     margin: Metrics.baseMargin,
-    flex: 4,
-    color: 'black'
   },
-  addButton: {
-    margin: Metrics.baseMargin
+  addButtonContainer : {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-around',
+    margin: Metrics.baseMargin,
+    flex: 1
   },
   pictureRow: {
     flex: 4,
@@ -31,8 +51,8 @@ export default StyleSheet.create({
     justifyContent: 'center',
   },
   picture: {
-    width: 80,
-    height: 80,
+    width: 200,
+    height: 200,
     resizeMode: "contain",
     margin: Metrics.baseMargin,
     flex: 4

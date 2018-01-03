@@ -1,24 +1,25 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { ScrollView, Text, KeyboardAvoidingView, TextInput, Button, View,
-  Picker, TouchableOpacity, Image, Platform } from 'react-native'
-import { connect } from 'react-redux'
-import { Images } from '../Themes'
-import { StackNavigator, NavigationActions } from 'react-navigation'
+  Picker, TouchableOpacity, Image, Platform } from 'react-native';
+import { connect } from 'react-redux';
+import { Images } from '../Themes';
+import { StackNavigator, NavigationActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
-import RNGooglePlaces from 'react-native-google-places'
+import RNGooglePlaces from 'react-native-google-places';
 import ImagePicker from 'react-native-image-crop-picker';
+import I18n from '../I18n/i18n';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
 // Styles
-import styles from './Styles/AddOfferScreenStyle'
+import styles from './Styles/AddOfferScreenStyle';
 
 const resetAction = NavigationActions.back({});
 
 class AddOfferScreen extends Component {
 
   static navigationOptions = {
-    title: 'Add a Offer',
+    title: I18n.t('addOfferScreen.title'),
     marginRight: 56
   };
 
@@ -30,33 +31,42 @@ class AddOfferScreen extends Component {
       volume: 0,
       metric: "ml",
       type: "can",
-      place: {name : "Select a Location"},
-      picture: null
+      place: {name : I18n.t('addOfferScreen.wizard.stageBeerOfferLocation.inputPlaceHolder')},
+      picture: null,
+      stage: 0
     };
     this.offersRef = firebase.database().ref("/offers");
   }
 
   onPressAddOffer () {
-    let offerObject = {
-      label: this.state.label,
-      price: this.state.price,
-      volume: this.state.volume,
-      metric: this.state.metric,
-      type: this.state.type,
-      createdAt: firebase.database.ServerValue.TIMESTAMP
-    }
+    if (this.state.stage == 5) {
+      let offerObject = {
+        label: this.state.label,
+        price: this.state.price,
+        volume: this.state.volume,
+        metric: this.state.metric,
+        type: this.state.type,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      }
 
-    if (this.state.place.placeID) {
-      offerObject.placeID = this.state.place.placeID;
-      firebase.database().ref("/places/" + offerObject.placeID).set(this.state.place);
-    }
+      if (this.state.place.placeID) {
+        offerObject.placeID = this.state.place.placeID;
+        firebase.database().ref("/places/" + offerObject.placeID).set(this.state.place);
+      }
 
-    let offerKey = this.offersRef.push(offerObject).key;
+      let offerKey = this.offersRef.push(offerObject).key;
 
-    if (this.state.picture != null) {
-      this.uploadImage(this.state.picture.uri, offerKey);
+      if (this.state.picture != null) {
+        this.uploadImage(this.state.picture.uri, offerKey);
+      }
+      this.props.navigation.dispatch(resetAction);
+    } else {
+      this.setState({stage: this.state.stage + 1});
     }
-    this.props.navigation.dispatch(resetAction);
+  }
+
+  onPressBack () {
+    this.setState({stage: this.state.stage - 1});
   }
 
   openSearchModal() {
@@ -88,120 +98,151 @@ class AddOfferScreen extends Component {
 
   render () {
     return (
-      <ScrollView style={styles.container}>
-        <View style= {styles.inputRow}>
-          <Text style={styles.labelField}>
-            Label:
-          </Text>
-          <TextInput
-            ref='LabelInput'
-            style={styles.inputField}
-            placeholder= "Label"
-            onChangeText={(value) => this.setState({label: value})}
-            returnKeyType="next"
-            onSubmitEditing={(event) => this.refs.PriceInput.focus()}
-          />
-        </View>
-        <View style= {styles.inputRow}>
-          <Text style={styles.labelField}>
-            Price:
-          </Text>
-          <TextInput
-            ref='PriceInput'
-            style={styles.inputField}
-            placeholder= "Price"
-            keyboardType="numeric"
-            onChangeText={(value) => this.setState({price: value})}
-            returnKeyType="next"
-            onSubmitEditing={(event) => this.refs.VolumeInput.focus()}
-          />
-        </View>
-        <View style= {styles.inputRow}>
-          <Text style={styles.labelField}>
-            Volume:
-          </Text>
-          <TextInput
-            ref='VolumeInput'
-            style={styles.inputField}
-            placeholder= "Volume"
-            keyboardType="numeric"
-            onChangeText={(value) => this.setState({volume: value})}
-            returnKeyType="next"
-          />
-        </View>
-        <View style= {styles.inputRow}>
-          <Text style={styles.labelField}>
-            Metric:
-          </Text>
-          <Picker
-            ref='MetricInput'
-            style={styles.inputField}
-            selectedValue={this.state.metric}
-            onValueChange={(itemValue, itemIndex) => this.setState({metric: itemValue})}>
-            <Picker.Item label="ML" value="ml" />
-            <Picker.Item label="Liter" value="lt" />
-          </Picker>
-        </View>
-        <View style= {styles.inputRow}>
-          <Text style={styles.labelField}>
-            Type:
-          </Text>
-          <Picker
-            ref='TypeInput'
-            style={styles.inputField}
-            selectedValue={this.state.type}
-            onValueChange={(itemValue, itemIndex) => this.setState({type: itemValue})}>
-            <Picker.Item label="Can" value="can" />
-            <Picker.Item label="Bottle" value="bottle" />
-            <Picker.Item label="Cup" value="cup" />
-          </Picker>
-        </View>
-        <View>
-          <TouchableOpacity
-            style= {styles.inputRow}
-            onPress={() => this.openSearchModal()}
-          >
-            <Text style={styles.labelField}>
-              Location:
+      <View style={styles.container}>
+        {(this.state.stage == 0) &&
+          <View style={styles.stage}>
+            <Text style={styles.stageTitle}>
+              {I18n.t('addOfferScreen.wizard.stageBeerLabel.title')}
             </Text>
+            <TextInput
+              ref='LabelInput'
+              style={styles.stageField}
+              placeholder= {I18n.t('addOfferScreen.wizard.stageBeerLabel.inputPlaceHolder')}
+              onChangeText={(value) => this.setState({label: value})}
+              returnKeyType="next"
+              onSubmitEditing={(event) => console.log('next')}
+            />
+          </View>
+        }
+        {(this.state.stage == 1) &&
+          <View style= {styles.stage}>
+            <Text style={styles.stageTitle}>
+              {I18n.t('addOfferScreen.wizard.stageBeerPrice.title')}
+            </Text>
+            <TextInput
+              ref='PriceInput'
+              style={styles.stageField}
+              placeholder= {I18n.t('addOfferScreen.wizard.stageBeerPrice.inputPlaceHolder')}
+              keyboardType="numeric"
+              onChangeText={(value) => this.setState({price: value})}
+              returnKeyType="next"
+              onSubmitEditing={(event) => console.log('next')}
+            />
+          </View>
+        }
+        {(this.state.stage == 2) &&
+          <View style= {styles.stage}>
+            <Text style={styles.stageTitle}>
+              {I18n.t('addOfferScreen.wizard.stageBeerVolume.title')}
+            </Text>
+            <View style={styles.volumeInputContainer}>
+              <TextInput
+                ref='VolumeInput'
+                style={styles.volumeInput}
+                placeholder= {I18n.t('addOfferScreen.wizard.stageBeerVolume.inputPlaceHolder')}
+                keyboardType="numeric"
+                onChangeText={(value) => this.setState({volume: value})}
+                returnKeyType="next"
+              />
+              <Picker
+                ref='MetricInput'
+                style={styles.volumeMetric}
+                selectedValue={this.state.metric}
+                onValueChange={(itemValue, itemIndex) => this.setState({metric: itemValue})}>
+                <Picker.Item label="ML" value="ml" />
+                <Picker.Item label="Liter" value="lt" />
+              </Picker>
+            </View>
+
+          </View>
+        }
+        {(this.state.stage == 3) &&
+          <View style= {styles.stage}>
+            <Text style={styles.stageTitle}>
+              {I18n.t('addOfferScreen.wizard.stageBeerContainerType.title')}
+            </Text>
+            <Picker
+              ref='TypeInput'
+              style={styles.stageField}
+              selectedValue={this.state.type}
+              onValueChange={(itemValue, itemIndex) => this.setState({type: itemValue})}>
+              <Picker.Item label="Can" value="can" />
+              <Picker.Item label="Bottle" value="bottle" />
+              <Picker.Item label="Cup" value="cup" />
+            </Picker>
+          </View>
+        }
+        {(this.state.stage == 4) &&
+          <View style={styles.stage}>
+            <TouchableOpacity
+              style={styles.stage}
+              onPress={() => this.openSearchModal()}>
+              <Text style={styles.stageTitle}>
+                {I18n.t('addOfferScreen.wizard.stageBeerOfferLocation.title')}
+              </Text>
               <TextInput
                 ref='LocationInput'
-                style={styles.inputField}
-                placeholder= "Select a location"
+                style={styles.stageField}
+                placeholder= {I18n.t('addOfferScreen.wizard.stageBeerOfferLocation.inputPlaceHolder')}
                 editable={false}
-                value={this.state.place.name}
-              />
-          </TouchableOpacity>
-        </View>
-        <View>
-          <TouchableOpacity
-            style= {styles.pictureRow}
-            onPress={() => this.openImagePicker()}
-          >
-            <Text style={styles.labelField}>
-              Picture:
-            </Text>
-            {this.state.picture == null ? (
-              <TextInput
-                ref='PictureInput'
-                style={styles.inputField}
-                placeholder= "Select a picture"
-                editable={false}
-              />
-            ) : (
-              <Image source={this.state.picture} style={styles.picture} />
-            )}
-          </TouchableOpacity>
-        </View>
-        <Button
-          onPress={this.onPressAddOffer.bind(this)}
-          title="Add Offer"
-          color="#841584"
-          style={styles.addButton}
-          accessibilityLabel="Add a new Offer"
-        />
+                value={this.state.place.name}/>
+            </TouchableOpacity>
+          </View>
+        }
+        {(this.state.stage == 5) &&
+          <View  style={styles.stage}>
+            <TouchableOpacity
+              style={styles.stage}
+              onPress={() => this.openImagePicker()}
+            >
+              <Text style={styles.stageTitle}>
+                {I18n.t('addOfferScreen.wizard.stageBeerOfferPicture.title')}
+              </Text>
+              {this.state.picture == null ? (
+                <TextInput
+                  ref='PictureInput'
+                  style={styles.stageField}
+                  placeholder= {I18n.t('addOfferScreen.wizard.stageBeerOfferPicture.inputPlaceHolder')}
+                  editable={false}
+                />
+              ) : (
+                <Image source={this.state.picture} style={styles.picture} />
+              )}
+            </TouchableOpacity>
+          </View>
+        }
+        <View style={styles.addButtonContainer}>
+          {(this.state.stage > 0) &&
+            <Button
+              onPress={this.onPressBack.bind(this)}
+              title="Back"
+              color="#595959"
+              style={styles.addButton}
+              accessibilityLabel="Back"
+            />
+          }
+          {this.state.stage < 5 &&
+            <Button
+              onPress={this.onPressAddOffer.bind(this)}
+              title="Next"
+              color="#f39c12"
+              style={styles.addButton}
+              accessibilityLabel="Next"
+            />
+          }
+          {this.state.stage == 5 &&
+            <Button
+              onPress={this.onPressAddOffer.bind(this)}
+              title="Add Offer"
+              color="#f39c12"
+              style={styles.addButton}
+              accessibilityLabel="Add a new Offer"
+            />
+          }
 
-      </ScrollView>
+        </View>
+
+      </View>
     )
   }
 }
