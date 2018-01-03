@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { ScrollView, Text, KeyboardAvoidingView, TextInput, Button, View,
-  Picker, TouchableOpacity, Image, Platform } from 'react-native';
+  Picker, TouchableOpacity, Image, Platform, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { Images } from '../Themes';
 import { StackNavigator, NavigationActions } from 'react-navigation';
@@ -26,12 +26,12 @@ class AddOfferScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      label: 'Label',
+      label: '',
       price: 0,
       volume: 0,
       metric: "ml",
       type: "can",
-      place: {name : I18n.t('addOfferScreen.wizard.stageBeerOfferLocation.inputPlaceHolder')},
+      place: {name : I18n.t('addOfferScreen.wizard.stageBeerOfferLocation.inputPlaceHolder'), placeID: ""},
       picture: null,
       stage: 0
     };
@@ -46,20 +46,22 @@ class AddOfferScreen extends Component {
         volume: this.state.volume,
         metric: this.state.metric,
         type: this.state.type,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        placeID: this.state.place.placeID ? this.state.place.placeID : ""
       }
 
-      if (this.state.place.placeID) {
-        offerObject.placeID = this.state.place.placeID;
+      if (this.isAValidOffer(offerObject)) {
+
         firebase.database().ref("/places/" + offerObject.placeID).set(this.state.place);
+
+        let offerKey = this.offersRef.push(offerObject).key;
+
+        if (this.state.picture != null) {
+          this.uploadImage(this.state.picture.uri, offerKey);
+        }
+        this.props.navigation.dispatch(resetAction);
       }
 
-      let offerKey = this.offersRef.push(offerObject).key;
-
-      if (this.state.picture != null) {
-        this.uploadImage(this.state.picture.uri, offerKey);
-      }
-      this.props.navigation.dispatch(resetAction);
     } else {
       this.setState({stage: this.state.stage + 1});
     }
@@ -83,7 +85,6 @@ class AddOfferScreen extends Component {
       cropping: true
     }).then(image => {
       let source = { uri: image.path };
-      console.log(image);
       this.setState({
         picture: source
       });
@@ -94,6 +95,47 @@ class AddOfferScreen extends Component {
   uploadImage(uri, offerKey, mime = 'image/jpg') {
     const imageRef = firebase.storage().ref('offersPictures').child(offerKey);
     imageRef.put(uri, { contentType: mime });
+  }
+
+  isAValidOffer (offer) {
+    var error = {title:"", message:"", stage:-1};
+
+    if (!offer.label) {
+      error.title = I18n.t('addOfferScreen.errorMessages.labelNotFound.title');
+      error.message = I18n.t('addOfferScreen.errorMessages.labelNotFound.message');
+      error.stage = 0;
+    } else if (!offer.price) {
+      error.title = I18n.t('addOfferScreen.errorMessages.priceNotSet.title');
+      error.message = I18n.t('addOfferScreen.errorMessages.priceNotSet.message');
+      error.stage = 1;
+    } else if (!offer.volume) {
+      error.title = I18n.t('addOfferScreen.errorMessages.volumeNotSet.title');
+      error.message = I18n.t('addOfferScreen.errorMessages.volumeNotSet.message');
+      error.stage = 2;
+    } else if (!offer.placeID) {
+      error.title = I18n.t('addOfferScreen.errorMessages.placeNotSet.title');
+      error.message = I18n.t('addOfferScreen.errorMessages.placeNotSet.message');
+      error.stage = 4;
+    } else if (this.state.picture == null) {
+      error.title = I18n.t('addOfferScreen.errorMessages.photoNotSet.title');
+      error.message = I18n.t('addOfferScreen.errorMessages.photoNotSet.message');
+      error.stage = 5;
+    }
+
+    if (error.stage >= 0) {
+      Alert.alert(
+        error.title,
+        error.message,
+        [
+          {text: 'OK', onPress: () => console.log('OK Pressed')},
+        ],
+        { cancelable: false }
+      );
+      this.setState({stage: error.stage});
+      return false;
+    } else {
+      return true;
+    }
   }
 
   render () {
@@ -151,6 +193,7 @@ class AddOfferScreen extends Component {
                 onValueChange={(itemValue, itemIndex) => this.setState({metric: itemValue})}>
                 <Picker.Item label="ML" value="ml" />
                 <Picker.Item label="Liter" value="lt" />
+                <Picker.Item label="Oz" value="oz" />
               </Picker>
             </View>
 

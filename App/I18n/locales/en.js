@@ -1,6 +1,28 @@
 export default {
   addOfferScreen : {
     title: "Add a Offer",
+    errorMessages: {
+      labelNotFound : {
+        title: "Label not Found",
+        message: "You need to set a beer label for this offer."
+      },
+      priceNotSet : {
+        title: "Price not set",
+        message: "You need to set a price for this offer."
+      },
+      volumeNotSet : {
+        title: "Volume not set",
+        message: "You need to set a net volume for this offer."
+      },
+      placeNotSet : {
+        title: "Place not set",
+        message: "You need to set a place for this offer."
+      },
+      photoNotSet : {
+        title: "Photo not take",
+        message: "You need to take a photo to prove this offer."
+      },
+    },
     wizard : {
       stageBeerLabel: {
         title : 'What is the beer label name?',
